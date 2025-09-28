@@ -1,0 +1,31 @@
+local plrList = getgenv().FriendsList or {}
+for i,v in pairs(plrList) do 
+	local plr = game.Players[v]
+  if not plr then continue end
+	local IsHeld = plr.IsHeld
+	IsHeld.Changed:Connect(function(val)
+		if IsHeld.Value == true and plr.Character.Head:FindFirstChild("PartOwner") and plr.Character.Head.PartOwner.Value ~= game.Players.LocalPlayer.Name then 
+			local Camera = workspace.CurrentCamera
+			local OriginalCameraCFrame = Camera.CFrame
+			Camera.CameraType = Enum.CameraType.Scriptable
+			Camera.CFrame = OriginalCameraCFrame
+			local oldCF = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = plr.Character.Torso.CFrame 
+			task.wait(0.1)	
+			repeat
+				game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = plr.Character.Torso.CFrame * CFrame.new(0,5,5) 
+				task.wait()
+				game.ReplicatedStorage.GrabEvents.SetNetworkOwner:FireServer(plr.Character.HumanoidRootPart, plr.Character.HumanoidRootPart.CFrame)
+				task.wait(0.05)
+			until plr.Character.Head:FindFirstChild("PartOwner") and plr.Character.Head.PartOwner.Value == game.Players.LocalPlayer.Name
+			plr.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			plr.Character.HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			task.wait(0.1)
+			game.ReplicatedStorage.GrabEvents.DestroyGrabLine:FireServer(plr.Character.HumanoidRootPart)
+			task.wait(0.1)
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = oldCF
+			Camera.CameraType = Enum.CameraType.Custom
+        	Camera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
+		end
+	end)
+end
