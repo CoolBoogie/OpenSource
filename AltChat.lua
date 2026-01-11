@@ -16,11 +16,13 @@ local function ChatMessage(arg1,text)
 	local FormattedText = "<font color='#27F5EE'><b>["..arg1.."]: </b></font>"..text
 	generalChannel:DisplaySystemMessage(FormattedText)
 end
+local Last 
 remote.OnClientEvent:Connect(function(arg1,arg2)
 	if typeof(arg2) == "string" then 
 		if string.len(arg2) <= 150 then 
 			print("Received by "..arg1.Name.." Message: "..arg2)
-			if arg1 ~= game.Players.LocalPlayer then 
+			if arg1 ~= game.Players.LocalPlayer and arg2 ~= Last then 
+				Last = arg2
 				ChatMessage(arg1.Name,arg2)
 			end
 		end
